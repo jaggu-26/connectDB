@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoServe — Queues</title>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/favicon-180.png">
+<style>
+  @font-face { font-family: 'Gilroy'; src: url('assets/Gilroy-Regular.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Gilroy'; src: url('assets/Gilroy-Medium.woff2') format('woff2'); font-weight: 500; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Gilroy'; src: url('assets/Gilroy-SemiBold.woff2') format('woff2'); font-weight: 600; font-style: normal; font-display: swap; }
+  @font-face { font-family: 'Gilroy'; src: url('assets/Gilroy-Bold.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: swap; }
+
+  /* ── GeoServe Design Tokens ── */
+  :root {
+    --brand:      #1852FE;
+    --brand-soft: #EAF1FE;
+    --text:       #0E1A33;
+    --text-2:     #5A6B85;
+    --text-dim:   #626E83;
+    --page-bg:    #F0F2F7;
+    --card:       #FFFFFF;
+    --border:     #E4E9F2;
+    --nav:        #001E4C;
+    --green:      #16A34A;
+    --green-10:   #E9F9EF;
+    --red:        #E63946;
+    --red-10:     #FEF1F2;
+    --amber:      #E0A030;
+    --amber-10:   #FEF9C3;
+    --blue-10:    #EEF6FF;
+    --purple-10:  #F8E5F5;
+    --purple-700: #710E61;
+    --chip:       #F1F4F9;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .skip-link { position:absolute;top:-100%;left:8px;z-index:9999;background:var(--brand);color:#fff;padding:8px 16px;border-radius:0 0 8px 8px;font-size:13px;font-weight:600;text-decoration:none; }
+  .skip-link:focus { top:0; }
+  :focus-visible { outline:2px solid var(--brand);outline-offset:2px;border-radius:3px; }
+  :focus:not(:focus-visible) { outline:none; }
+
+  html, body {
+    height: 100%;
+    font-family: 'Gilroy', -apple-system, system-ui, sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--page-bg);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+  button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+  a { color: inherit; }
+
+  .app { display: flex; width: 100vw; height: 100vh; overflow: hidden; }
+
+  /* ── Nav Rail ── */
+  .nav {
+    width: 56px; flex-shrink: 0;
+    background: #fff;
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; align-items: center;
+    padding: 16px 0;
+    height: 100vh;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+  .nav-logo { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; margin-bottom: 18px; cursor: pointer; color: var(--text); transition: background .12s; }
+  .nav-logo:hover { background: #F4F7FB; }
+  .nav-logo svg { width: 22px; height: 22px; }
+  .nav-group { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .nav-group.bottom { margin-top: auto; }
+  .nico {
+    position: relative;
+    width: 36px; height: 36px;
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    color: #000;
+    flex-shrink: 0;
+    transition: background .12s, color .12s;
+  }
+  .nico:hover { background: #F4F7FB; color: var(--brand); }
+  .nico.active { background: var(--blue-10); color: var(--brand); }
+  .nico.nico-accent { color: var(--brand); }
+  .nico svg { width: 19px; height: 19px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+  .nav-avatar {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--nav); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 11px;
+    margin-top: 6px;
+  }
+  .nico[data-tip]::after {
+    content: attr(data-tip);
+    position: absolute; left: 46px; top: 50%; transform: translateY(-50%);
+    background: #0A2540; color: #fff;
+    font-size: 11.5px; font-weight: 500;
+    padding: 5px 10px; border-radius: 7px;
+    white-space: nowrap;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+    opacity: 0; pointer-events: none;
+    transition: opacity .12s;
+    z-index: 50;
+  }
+  .nico:hover::after { opacity: 1; }
+
+  /* ── Main column ── */
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+  .content { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+  .content::-webkit-scrollbar { width: 8px; }
+  .content::-webkit-scrollbar-thumb { background: #D4DBE6; border-radius: 4px; }
+
+  /* Breadcrumb + page header */
+  .breadcrumb { font-size: 12px; color: var(--text-dim); display: flex; align-items: center; gap: 6px; }
+  .breadcrumb a { color: var(--text-dim); text-decoration: none; font-weight: 600; }
+  .breadcrumb a:hover { color: var(--brand); }
+  .breadcrumb .sep { color: var(--border); }
+  .breadcrumb .current { color: var(--text); font-weight: 600; }
+  .page-title-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .page-title { font-size: 22px; font-weight: 700; color: var(--text); margin-top: 4px; }
+  .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; color: var(--text-2); text-decoration: none; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border); background: #fff; transition: border-color .12s, color .12s; }
+  .back-link:hover { border-color: var(--brand); color: var(--brand); }
+  .back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+  /* ── Generic card ── */
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; }
+  .card-pad { padding: 18px; }
+  .section-label { font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.6px; }
+
+  /* Tabs */
+  .queue-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+  .queue-tab {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 16px; border-radius: 9px;
+    font-size: 13px; font-weight: 600; color: var(--text-2);
+    background: #fff; border: 1px solid var(--border);
+    transition: border-color .12s, color .12s, background .12s;
+  }
+  .queue-tab:hover { border-color: var(--brand); color: var(--brand); }
+  .queue-tab.active { background: var(--brand); border-color: var(--brand); color: #fff; }
+  .queue-tab .tab-count { font-size: 11px; font-weight: 700; background: rgba(255,255,255,0.25); padding: 1px 8px; border-radius: 10px; }
+  .queue-tab:not(.active) .tab-count { background: var(--chip); color: var(--text-2); }
+  .queue-tab .tab-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+  .queue-panel { display: none; }
+  .queue-panel.active { display: block; }
+
+  /* Queue card (reused from dashboard) */
+  .queue-card { overflow: hidden; }
+  .queue-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; }
+  .queue-head.red { background: var(--red-10); }
+  .queue-head.blue { background: var(--blue-10); }
+  .queue-head.amber { background: var(--amber-10); }
+  .queue-head.navy { background: #E7ECF5; }
+  .queue-head-left { display: flex; align-items: center; gap: 8px; }
+  .queue-dot { width: 7px; height: 7px; border-radius: 50%; }
+  .queue-dot.red { background: var(--red); }
+  .queue-dot.blue { background: var(--brand); }
+  .queue-dot.amber { background: #CA8A03; }
+  .queue-dot.navy { background: var(--nav); }
+  .queue-title { font-size: 13px; font-weight: 700; }
+  .queue-title.red { color: #981B1B; }
+  .queue-title.blue { color: var(--brand); }
+  .queue-title.amber { color: #844D0F; }
+  .queue-title.navy { color: var(--nav); }
+  .queue-count { font-size: 11px; font-weight: 700; background: rgba(255,255,255,0.7); padding: 1px 8px; border-radius: 10px; }
+
+  .qrow { display: flex; align-items: center; gap: 12px; padding: 12px 18px; border-top: 1px solid var(--border); }
+  .type-pill { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; flex-shrink: 0; width: 46px; text-align: center; }
+  .type-pill.pda { background: var(--blue-10); color: var(--brand); }
+  .type-pill.fda { background: #DBEAFE; color: #1D40AF; }
+  .type-pill.sda { background: var(--green-10); color: #147638; }
+  .type-pill.apda { background: var(--purple-10); color: var(--purple-700); }
+  .qrow-main { flex: 1; min-width: 0; }
+  .qrow-id { font-size: 12.5px; font-weight: 700; color: var(--text); }
+  .qrow-meta { font-size: 11.5px; color: var(--text-dim); margin-top: 2px; }
+  .qrow-amount { text-align: right; flex-shrink: 0; min-width: 92px; }
+  .qrow-usd { font-size: 13px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+  .qrow-usd-meta { font-size: 10.5px; color: var(--text-dim); }
+  .day-badge { font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 10px; flex-shrink: 0; white-space: nowrap; }
+  .day-badge.overdue { background: var(--red-10); color: #B91C1B; }
+  .day-badge.today { background: var(--green-10); color: #147638; }
+  .day-badge.soon { background: var(--amber-10); color: #A16207; }
+  .day-badge.ok { background: var(--blue-10); color: var(--brand); }
+  .qrow-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .btn-xs { height: 28px; padding: 0 12px; border-radius: 7px; font-size: 11.5px; font-weight: 700; }
+  .btn-xs.danger { background: var(--red); color: #fff; }
+  .btn-xs.danger:hover { opacity: .9; }
+  .btn-xs.ghost { background: #fff; border: 1px solid var(--border); color: var(--text-2); }
+  .btn-xs.ghost:hover { background: var(--chip); }
+  .btn-xs.primary { background: var(--brand); color: #fff; }
+  .btn-xs.primary:hover { opacity: .9; }
+  .btn-xs.amber { background: #EAB305; color: #412007; }
+  .btn-xs.amber:hover { opacity: .9; }
+
+  /* Pending appointment list */
+  .pc-row { display: flex; align-items: center; justify-content: space-between; padding: 13px 18px; border-top: 1px solid var(--border); }
+  .pc-row:first-of-type { border-top: none; }
+  .pc-name { font-size: 13px; font-weight: 700; color: var(--text); }
+  .pc-meta { font-size: 11.5px; color: var(--text-dim); margin-top: 2px; }
+  .pc-date { text-align: right; }
+  .pc-day { font-size: 13px; font-weight: 700; color: var(--text); }
+  .pc-rel { font-size: 11px; font-weight: 600; margin-top: 2px; }
+  .pc-rel.today { color: var(--red); }
+  .pc-rel.soon { color: #A16207; }
+  .pc-rel.later { color: var(--text-dim); }
+</style>
+</head>
+<body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<div class="app">
+
+  <aside class="nav" aria-label="Primary">
+    <div class="nav-logo" role="button" aria-label="Menu" tabindex="0">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5.25 12H18.75H5.25Z" fill="black"/>
+        <path d="M5.25 12H18.75" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M5.25 6.75H18.75H5.25Z" fill="black"/>
+        <path d="M5.25 6.75H18.75" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M5.25 17.25H18.75H5.25Z" fill="black"/>
+        <path d="M5.25 17.25H18.75" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <div class="nav-group">
+      <button class="nico nico-accent" data-tip="Masters" aria-label="Masters">
+        <svg viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="7" height="7" rx="1.8" fill="currentColor"/>
+          <rect x="14" y="3" width="7" height="7" rx="1.8" fill="currentColor"/>
+          <rect x="3" y="14" width="7" height="7" rx="1.8" fill="currentColor"/>
+          <rect x="14" y="14" width="7" height="7" rx="1.8" fill="currentColor"/>
+        </svg>
+      </button>
+      <a class="nico" data-tip="Dashboard" aria-label="Dashboard" href="geoconnect-db.html">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+      </a>
+      <button class="nico" data-tip="Inquiry" aria-label="Inquiry">
+        <svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>
+      </button>
+      <button class="nico" data-tip="Analytics" aria-label="Analytics">
+        <svg viewBox="0 0 24 24"><line x1="5" y1="20" x2="5" y2="12"/><line x1="12" y1="20" x2="12" y2="6"/><line x1="19" y1="20" x2="19" y2="15"/></svg>
+      </button>
+      <button class="nico" data-tip="Messages" aria-label="Messages">
+        <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+      </button>
+      <button class="nico" data-tip="Invoices" aria-label="Invoices">
+        <svg viewBox="0 0 24 24"><path d="M6 2h9l3 3v17H6z"/><path d="M15 2v3h3"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="9" y1="7" x2="12" y2="7"/></svg>
+      </button>
+      <button class="nico active" data-tip="Approvals" aria-current="page" aria-label="Approvals">
+        <svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8l1.5 1.5L12 7"/><line x1="14" y1="8" x2="17" y2="8"/><path d="M8 14l1.5 1.5L12 13"/><line x1="14" y1="14" x2="17" y2="14"/></svg>
+      </button>
+      <button class="nico" data-tip="Claims" aria-label="Claims">
+        <svg viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.5 8.5-8 11-4.5-2.5-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/></svg>
+      </button>
+      <button class="nico" data-tip="Vessels" aria-label="Vessels">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><line x1="12" y1="7" x2="12" y2="21"/><path d="M5 12a7 7 0 0 0 14 0"/><line x1="5" y1="12" x2="8" y2="12"/><line x1="16" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <button class="nico" data-tip="Audit" aria-label="Audit">
+        <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="20" y1="20" x2="15.5" y2="15.5"/></svg>
+      </button>
+      <button class="nico" data-tip="Port Calls" aria-label="Port Calls">
+        <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+      </button>
+      <button class="nico" data-tip="Certificates" aria-label="Certificates">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="6"/><path d="M9 14l-2 7 5-3 5 3-2-7"/></svg>
+      </button>
+      <button class="nico" data-tip="Settings" aria-label="Settings">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>
+      </button>
+    </div>
+
+    <div class="nav-group bottom">
+      <button class="nico" data-tip="Reports" aria-label="Reports">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 12l10 5 10-5"/><path d="M2 17l10 5 10-5"/></svg>
+      </button>
+      <button class="nico" data-tip="Notifications" aria-label="Notifications">
+        <svg viewBox="0 0 24 24"><path d="M12 3a5 5 0 0 0-5 5v3.5c0 1-.4 2-1.2 2.7L4.5 15.5A1 1 0 0 0 5.2 17h13.6a1 1 0 0 0 .7-1.7l-1.3-1.3c-.8-.7-1.2-1.7-1.2-2.7V8a5 5 0 0 0-5-5z"/><path d="M9.5 20a2.5 2.5 0 0 0 5 0"/></svg>
+      </button>
+      <div class="nav-avatar" title="Jagadeesh Nagappan">JN</div>
+    </div>
+  </aside>
+
+  <main class="main" id="main-content">
+    <div class="content">
+
+      <div>
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+          <a href="geoconnect-db.html">Dashboard</a>
+          <span class="sep">/</span>
+          <span class="current">Queues</span>
+        </nav>
+        <div class="page-title-row">
+          <div class="page-title">Action queues</div>
+          <a class="back-link" href="geoconnect-db.html">
+            <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+            Back to dashboard
+          </a>
+        </div>
+      </div>
+
+      <div class="queue-tabs" id="queueTabs" role="tablist">
+        <button class="queue-tab" data-tab="overdue" role="tab">
+          <span class="tab-dot" style="background:var(--red);"></span>
+          Overdue — act now
+          <span class="tab-count">3</span>
+        </button>
+        <button class="queue-tab" data-tab="approval" role="tab">
+          <span class="tab-dot" style="background:var(--brand);"></span>
+          Pending your approval
+          <span class="tab-count">5</span>
+        </button>
+        <button class="queue-tab" data-tab="clarification" role="tab">
+          <span class="tab-dot" style="background:#CA8A03;"></span>
+          Under clarification
+          <span class="tab-count">4</span>
+        </button>
+        <button class="queue-tab" data-tab="appointment" role="tab">
+          <span class="tab-dot" style="background:var(--nav);"></span>
+          Pending appointment
+          <span class="tab-count">5</span>
+        </button>
+      </div>
+
+      <!-- Overdue -->
+      <div class="queue-panel" data-panel="overdue">
+        <div class="card queue-card">
+          <div class="queue-head red">
+            <div class="queue-head-left"><span class="queue-dot red"></span><span class="queue-title red">Overdue — act now</span><span class="queue-count">3</span></div>
+          </div>
+          <div class="qrow">
+            <span class="type-pill pda">PDA</span>
+            <div class="qrow-main"><div class="qrow-id">TST2600098</div><div class="qrow-meta">Pacific Wind · Hamburg</div></div>
+            <div class="qrow-amount"><div class="qrow-usd">USD 5,240</div><div class="qrow-usd-meta">PDA USD 5,900 · due 18 Jun</div></div>
+            <span class="day-badge overdue">14d overdue</span>
+            <div class="qrow-actions"><button class="btn-xs danger">Escalate</button><button class="btn-xs ghost">Chase</button></div>
+          </div>
+          <div class="qrow">
+            <span class="type-pill fda">FDA</span>
+            <div class="qrow-main"><div class="qrow-id">TST2600082</div><div class="qrow-meta">Omicron West · Singapore</div></div>
+            <div class="qrow-amount"><div class="qrow-usd">USD 38,720</div><div class="qrow-usd-meta">PDA USD 42,310 · due 12 Jun</div></div>
+            <span class="day-badge overdue">12d overdue</span>
+            <div class="qrow-actions"><button class="btn-xs danger">Escalate</button><button class="btn-xs ghost">Chase</button></div>
+          </div>
+          <div class="qrow">
+            <span class="type-pill sda">SDA</span>
+            <div class="qrow-main"><div class="qrow-id">TST2600114</div><div class="qrow-meta">Test Vessel 1 · Test Port</div></div>
+            <div class="qrow-amount"><div class="qrow-usd">USD 8,640</div><div class="qrow-usd-meta">PDA USD 9,200 · due 24 Jun</div></div>
+            <span class="day-badge overdue">8d overdue</span>
+            <div class="qrow-actions"><button class="btn-xs danger">Escalate</button><button class="btn-xs ghost">Chase</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pending approval -->
+      <div class="queue-panel" data-panel="approval">
+        <div class="card queue-card">
+          <div class="queue-head blue">
+            <div class="queue-head-left"><span class="queue-dot blue"></span><span class="queue-title blue">Pending your approval</span><span class="queue-count">5</span></div>
+          </div>
+          <div class="qrow">
+            <span class="type-pill fda">FDA</span>
+            <div class="qrow-main"><div class="qrow-id">TST2600082</div><div class="qrow-meta">Omicron West · Singapore · ABC Test Shipping</div></div>
+            <div class="qrow-amount"><div class="qrow-usd">USD 25,624</div><div class="qrow-usd-meta">Balance</div></div>
+            <span class="day-badge soon">6 days</span>
+            <div class="qrow-actions"><button class="btn-xs primary">Approve</button><button class="btn-xs ghost">Query</button></div>
+          </div>
+          <div class="qrow">
+            <span class="type-pill fda">FDA</span>
+            <div class="qrow-main"><div class="qrow-id">TST2600113</div><div class="qrow-meta">Test Vessel 1 · Singapore · ABC Test Shipping</div></div>
+            <div class="qrow-amount"><div class="qrow-usd">USD 18,450</div><div class="qrow-usd-meta">Balance</div></div>
+            <span class="day-badge soon">3 days</span>
+            <div class="qrow-actions"><button class="btn-xs primary">Approve</button><button class="btn-xs ghost">Query</button></div>
+          </div>
+          <div class="qrow">
+            <span class="type-pill apda">APDA</span>
+            <div class="qrow-main"><div class="qrow-id">TST2600067</div><div class="qrow-meta">Test Vessel 1 · Test Port · ABC Test Shipping</div></div>
+            <div class="qrow-amount"><div class="qrow-usd">USD 6,318</div><div class="qrow-usd-meta">Total</div></div>
+            <span class="day-badge soon">3 days</span>
+            <div class="qrow-actions"><button class="btn-xs primary">Approve</button><button class="btn-xs ghost">Query</button></div>
+          </div>
+          <div class="qrow">
+            <span class="type-pill sda">SDA</span>
+            <div class="qrow-main"><div class="qrow-id">TST2600114</div><div class="qrow-meta">Test Vessel 1 · Test Port · Keppel Smit</div></div>
+            <div class="qrow-amount"><div class="qrow-usd">USD 637</div><div class="qrow-usd-meta">Balance</div></div>
+            <span class="day-badge today">Today</span>
+            <div class="qrow-actions"><button class="btn-xs primary">Approve</button><button class="btn-xs ghost">Query</button></div>
+          </div>
+          <div class="qrow">
+            <span class="type-pill pda">PDA</span>
+            <div class="qrow-main"><div class="qrow-id">TST2600117</div><div class="qrow-meta">Test Vessel 1 · Test Port · Test Vendor 22</div></div>
+            <div class="qrow-amount"><div class="qrow-usd">USD 4,200</div><div class="qrow-usd-meta">Total</div></div>
+            <span class="day-badge ok">1 day</span>
+            <div class="qrow-actions"><button class="btn-xs primary">Approve</button><button class="btn-xs ghost">Query</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Under clarification -->
+      <div class="queue-panel" data-panel="clarification">
+        <div class="card queue-card">
+          <div class="queue-head amber">
+            <div class="queue-head-left"><span class="queue-dot amber"></span><span class="queue-title amber">Under clarification</span><span class="queue-count">4</span></div>
+          </div>
+          <div class="qrow">
+            <span class="type-pill pda">PDA</span>
+            <div class="qrow-main"><div class="qrow-id">TST2600111</div><div class="qrow-meta">Omicron West · Singapore · ABC Test Shipping</div></div>
+            <div class="qrow-amount"><div class="qrow-usd">USD 15,400</div><div class="qrow-usd-meta">Balance</div></div>
+            <span class="day-badge soon">8 days</span>
+            <div class="qrow-actions"><button class="btn-xs amber">Resolve</button><button class="btn-xs ghost">Reply</button></div>
+          </div>
+          <div class="qrow">
+            <span class="type-pill fda">FDA</span>
+            <div class="qrow-main"><div class="qrow-id">TST2600140</div><div class="qrow-meta">Atlantic Hope · Test Port · Keppel Smit</div></div>
+            <div class="qrow-amount"><div class="qrow-usd">USD 12,750</div><div class="qrow-usd-meta">Balance</div></div>
+            <span class="day-badge soon">6 days</span>
+            <div class="qrow-actions"><button class="btn-xs amber">Resolve</button><button class="btn-xs ghost">Reply</button></div>
+          </div>
+          <div class="qrow">
+            <span class="type-pill fda">FDA</span>
+            <div class="qrow-main"><div class="qrow-id">TST2600120</div><div class="qrow-meta">Nordic Star · Rotterdam · ABC Test Shipping</div></div>
+            <div class="qrow-amount"><div class="qrow-usd">USD 9,880</div><div class="qrow-usd-meta">Balance</div></div>
+            <span class="day-badge soon">5 days</span>
+            <div class="qrow-actions"><button class="btn-xs amber">Resolve</button><button class="btn-xs ghost">Reply</button></div>
+          </div>
+          <div class="qrow">
+            <span class="type-pill pda">PDA</span>
+            <div class="qrow-main"><div class="qrow-id">TST2600131</div><div class="qrow-meta">Pacific Wind · Hamburg · Test Vendor 22</div></div>
+            <div class="qrow-amount"><div class="qrow-usd">USD 3,120</div><div class="qrow-usd-meta">Total</div></div>
+            <span class="day-badge ok">2 days</span>
+            <div class="qrow-actions"><button class="btn-xs amber">Resolve</button><button class="btn-xs ghost">Reply</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pending appointment -->
+      <div class="queue-panel" data-panel="appointment">
+        <div class="card queue-card">
+          <div class="queue-head navy">
+            <div class="queue-head-left"><span class="queue-dot navy"></span><span class="queue-title navy">Pending appointment</span><span class="queue-count">5</span></div>
+          </div>
+          <div class="pc-row">
+            <div><div class="pc-name">Omicron West</div><div class="pc-meta">Singapore · V026-04</div></div>
+            <div class="pc-date"><div class="pc-day">02 Jul</div><div class="pc-rel today">Today</div></div>
+          </div>
+          <div class="pc-row">
+            <div><div class="pc-name">Nordic Star</div><div class="pc-meta">Rotterdam · NS-2026-07</div></div>
+            <div class="pc-date"><div class="pc-day">04 Jul</div><div class="pc-rel soon">in 2d</div></div>
+          </div>
+          <div class="pc-row">
+            <div><div class="pc-name">Pacific Wind</div><div class="pc-meta">Hamburg · PW-114</div></div>
+            <div class="pc-date"><div class="pc-day">06 Jul</div><div class="pc-rel soon">in 4d</div></div>
+          </div>
+          <div class="pc-row">
+            <div><div class="pc-name">Atlantic Hope</div><div class="pc-meta">Test Port · AH-038</div></div>
+            <div class="pc-date"><div class="pc-day">08 Jul</div><div class="pc-rel later">in 6d</div></div>
+          </div>
+          <div class="pc-row">
+            <div><div class="pc-name">Test Vessel 3</div><div class="pc-meta">Singapore · TV3-22</div></div>
+            <div class="pc-date"><div class="pc-day">10 Jul</div><div class="pc-rel later">in 8d</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+(function () {
+  const tabs = document.querySelectorAll('#queueTabs .queue-tab');
+  const panels = document.querySelectorAll('.queue-panel');
+
+  function activate(name) {
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+    panels.forEach(p => p.classList.toggle('active', p.dataset.panel === name));
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      activate(tab.dataset.tab);
+      const url = new URL(window.location.href);
+      url.searchParams.set('tab', tab.dataset.tab);
+      window.history.replaceState({}, '', url);
+    });
+  });
+
+  const validTabs = Array.from(tabs).map(t => t.dataset.tab);
+  const requested = new URLSearchParams(window.location.search).get('tab');
+  activate(validTabs.includes(requested) ? requested : validTabs[0]);
+})();
+</script>
+</body>
+</html>
