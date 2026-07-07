@@ -114,37 +114,17 @@
   .content::-webkit-scrollbar { width: 8px; }
   .content::-webkit-scrollbar-thumb { background: #D4DBE6; border-radius: 4px; }
 
-  /* Breadcrumb + page header */
-  .breadcrumb { font-size: 12px; color: var(--text-dim); display: flex; align-items: center; gap: 6px; }
-  .breadcrumb a { color: var(--text-dim); text-decoration: none; font-weight: 600; }
+  /* Breadcrumb */
+  .breadcrumb { font-size: 12px; color: var(--text-dim); display: flex; align-items: center; gap: 6px; font-weight: 600; }
+  .breadcrumb a { color: var(--text-dim); text-decoration: none; font-weight: 600; transition: color .12s; }
   .breadcrumb a:hover { color: var(--brand); }
-  .breadcrumb .sep { color: var(--border); }
-  .breadcrumb .current { color: var(--text); font-weight: 600; }
-  .page-title-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-  .page-title { font-size: 22px; font-weight: 700; color: var(--text); margin-top: 4px; }
-  .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; color: var(--text-2); text-decoration: none; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border); background: #fff; transition: border-color .12s, color .12s; }
-  .back-link:hover { border-color: var(--brand); color: var(--brand); }
-  .back-link svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+  .crumb-arrow { width: 13px; height: 13px; color: var(--text-dim); flex-shrink: 0; }
+  .breadcrumb .current { color: var(--text); font-weight: 700; }
 
   /* ── Generic card ── */
   .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; }
   .card-pad { padding: 18px; }
   .section-label { font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.6px; }
-
-  /* Tabs */
-  .queue-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
-  .queue-tab {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 10px 16px; border-radius: 9px;
-    font-size: 13px; font-weight: 600; color: var(--text-2);
-    background: #fff; border: 1px solid var(--border);
-    transition: border-color .12s, color .12s, background .12s;
-  }
-  .queue-tab:hover { border-color: var(--brand); color: var(--brand); }
-  .queue-tab.active { background: var(--brand); border-color: var(--brand); color: #fff; }
-  .queue-tab .tab-count { font-size: 11px; font-weight: 700; background: rgba(255,255,255,0.25); padding: 1px 8px; border-radius: 10px; }
-  .queue-tab:not(.active) .tab-count { background: var(--chip); color: var(--text-2); }
-  .queue-tab .tab-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
 
   .queue-panel { display: none; }
   .queue-panel.active { display: block; }
@@ -208,6 +188,81 @@
   .pc-rel.today { color: var(--red); }
   .pc-rel.soon { color: #A16207; }
   .pc-rel.later { color: var(--text-dim); }
+
+  /* ── Page header (per-panel): title + count + description + stats ── */
+  .page-hdr { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 16px; }
+  .page-hdr > div:first-child { min-width: 0; flex: 1 1 auto; }
+  .page-hdr .page-stats { flex-shrink: 0; }
+  .page-hdr .page-title-row { display: flex; align-items: center; gap: 10px; }
+  .page-hdr .page-title { font-size: 19px; font-weight: 800; color: var(--nav); letter-spacing: -0.01em; margin-top: 0; }
+  .page-count { font-size: 12.5px; font-weight: 700; color: var(--brand); background: var(--blue-10); padding: 3px 10px; border-radius: 999px; }
+  .page-count.danger { color: #B91C1B; background: var(--red-10); }
+  .page-desc { font-size: 12.5px; color: var(--text-dim); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .page-stats { display: flex; gap: 10px; flex-wrap: wrap; }
+  .pstat { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 9px 15px; display: flex; flex-direction: column; gap: 2px; min-width: 100px; }
+  .pstat-val { font-size: 17px; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; }
+  .pstat-val.danger { color: var(--red); }
+  .pstat-lbl { font-size: 10.5px; color: var(--text-2); font-weight: 600; }
+
+  /* ── Filter tabs (per-panel, by DA type) ── */
+  .filter-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .filter-tab { padding: 6px 13px; border-radius: 999px; background: #F4F7FB; border: 1px solid var(--border); font-size: 12px; font-weight: 600; color: var(--text-2); cursor: pointer; transition: all .15s; white-space: nowrap; }
+  .filter-tab:hover { background: var(--blue-10); border-color: var(--brand); color: var(--brand); }
+  .filter-tab.active { background: var(--brand); border-color: var(--brand); color: #fff; }
+
+  /* ── Data table ── */
+  .table-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; overflow-x: auto; }
+  .dtable { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .dtable thead th { padding: 12px 16px; text-align: left; font-size: 10px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; background: #F6F8FC; border-bottom: 1px solid var(--border); }
+  .dtable thead th.num { text-align: right; }
+  .dtable thead th.mid { text-align: center; }
+  .dtable tbody tr { border-bottom: 1px solid var(--border); transition: background .12s; }
+  .dtable tbody tr:last-child { border-bottom: none; }
+  .dtable tbody tr:hover { background: #F9FBFF; }
+  .dtable tbody tr.row-in { animation: rowIn .35s ease both; }
+  @keyframes rowIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .dtable td { padding: 12px 16px; color: var(--text-2); vertical-align: middle; }
+  .dtable td.pc-id { font-weight: 700; color: var(--text); white-space: nowrap; }
+  .dtable td.num { text-align: right; font-variant-numeric: tabular-nums; color: var(--text); white-space: nowrap; }
+  .dtable td.mid { text-align: center; }
+  .dtable td.actions { display: flex; gap: 6px; justify-content: flex-start; }
+
+  .da-tier { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 5px; letter-spacing: 0.02em; white-space: nowrap; }
+  .da-tier.pda { background: var(--blue-10); color: #1D40AF; }
+  .da-tier.fda { background: var(--green-10); color: #0E4F26; }
+  .da-tier.apda { background: var(--purple-10); color: var(--purple-700); }
+  .da-tier.sda { background: var(--amber-10); color: #713E11; }
+
+  .da-pill { font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 999px; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+  .da-pill::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: .7; }
+  .da-pill.urgent { background: var(--red-10); color: var(--red); }
+  .da-pill.warn { background: var(--amber-10); color: #844D0F; }
+  .da-pill.ok { background: var(--green-10); color: #147638; }
+  .da-pill.info { background: var(--blue-10); color: var(--brand); }
+  .da-pill.slate { background: var(--chip); color: var(--text-2); }
+
+  .btn-mini { height: 27px; padding: 0 11px; border-radius: 7px; font-size: 11.5px; font-weight: 700; font-family: inherit; cursor: pointer; border: none; transition: all .15s; white-space: nowrap; }
+  .btn-mini:active { transform: scale(.94); }
+  .btn-mini.btn-approve { background: var(--brand); color: #fff; }
+  .btn-mini.btn-approve:hover { background: #0B3FE0; }
+  .btn-mini.btn-escalate { background: var(--red); color: #fff; }
+  .btn-mini.btn-escalate:hover { opacity: .9; }
+  .btn-mini.btn-resolve { background: #EAB305; color: #412007; }
+  .btn-mini.btn-resolve:hover { opacity: .9; }
+  .btn-mini.btn-ghost { background: var(--page-bg); color: var(--text-2); border: 1px solid var(--border); }
+  .btn-mini.btn-ghost:hover { background: #fff; color: var(--text); border-color: #C7D5EE; }
+
+  /* ── Toast ── */
+  .toast-wrap { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; gap: 8px; z-index: 999; align-items: center; }
+  .toast { display: flex; align-items: center; gap: 8px; background: var(--nav); color: #fff; font-size: 12.5px; font-weight: 600; padding: 10px 16px; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); animation: toastIn .25s ease both; }
+  .toast svg { width: 14px; height: 14px; color: #4ADE80; flex-shrink: 0; }
+  .toast.out { animation: toastOut .25s ease both; }
+  @keyframes toastIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateY(6px); } }
+  @media (prefers-reduced-motion: reduce) {
+    .toast { animation: none; }
+    .dtable tbody tr.row-in { animation: none; }
+  }
 </style>
 </head>
 <body>
@@ -287,181 +342,169 @@
   <main class="main" id="main-content">
     <div class="content">
 
-      <div>
-        <nav class="breadcrumb" aria-label="Breadcrumb">
-          <a href="geoconnect-db">Dashboard</a>
-          <span class="sep">/</span>
-          <span class="current">Queues</span>
-        </nav>
-        <div class="page-title-row">
-          <div class="page-title">Action queues</div>
-          <a class="back-link" href="geoconnect-db">
-            <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-            Back to dashboard
-          </a>
-        </div>
-      </div>
-
-      <div class="queue-tabs" id="queueTabs" role="tablist">
-        <button class="queue-tab" data-tab="overdue" role="tab">
-          <span class="tab-dot" style="background:var(--red);"></span>
-          Overdue — act now
-          <span class="tab-count">3</span>
-        </button>
-        <button class="queue-tab" data-tab="approval" role="tab">
-          <span class="tab-dot" style="background:var(--brand);"></span>
-          Pending your approval
-          <span class="tab-count">5</span>
-        </button>
-        <button class="queue-tab" data-tab="clarification" role="tab">
-          <span class="tab-dot" style="background:#CA8A03;"></span>
-          Under clarification
-          <span class="tab-count">4</span>
-        </button>
-        <button class="queue-tab" data-tab="appointment" role="tab">
-          <span class="tab-dot" style="background:var(--nav);"></span>
-          Pending appointment
-          <span class="tab-count">5</span>
-        </button>
-      </div>
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="geoconnect-db">Dashboard</a>
+        <svg class="crumb-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+        <span class="current" id="breadcrumbCurrent">Overdue DAs</span>
+      </nav>
 
       <!-- Overdue -->
       <div class="queue-panel" data-panel="overdue">
-        <div class="card queue-card">
-          <div class="queue-head red">
-            <div class="queue-head-left"><span class="queue-dot red"></span><span class="queue-title red">Overdue — act now</span><span class="queue-count">3</span></div>
+        <div class="page-hdr">
+          <div>
+            <div class="page-title-row"><h2 class="page-title">Overdue DAs</h2><span class="page-count danger">3</span></div>
+            <p class="page-desc">FDA not received from agent beyond the agreed number of days after the vessel sailed.</p>
           </div>
-          <div class="qrow">
-            <span class="type-pill pda">PDA</span>
-            <div class="qrow-main"><div class="qrow-id">TST2600098</div><div class="qrow-meta">Pacific Wind · Hamburg</div></div>
-            <div class="qrow-amount"><div class="qrow-usd">USD 5,240</div><div class="qrow-usd-meta">PDA USD 5,900 · due 18 Jun</div></div>
-            <span class="day-badge overdue">14d overdue</span>
-            <div class="qrow-actions"><button class="btn-xs danger">Escalate</button><button class="btn-xs ghost">Chase</button></div>
+          <div class="page-stats">
+            <div class="pstat"><span class="pstat-val danger">USD 52,600</span><span class="pstat-lbl">Total overdue</span></div>
+            <div class="pstat"><span class="pstat-val danger">14d</span><span class="pstat-lbl">Most overdue</span></div>
           </div>
-          <div class="qrow">
-            <span class="type-pill fda">FDA</span>
-            <div class="qrow-main"><div class="qrow-id">TST2600082</div><div class="qrow-meta">Omicron West · Singapore</div></div>
-            <div class="qrow-amount"><div class="qrow-usd">USD 38,720</div><div class="qrow-usd-meta">PDA USD 42,310 · due 12 Jun</div></div>
-            <span class="day-badge overdue">12d overdue</span>
-            <div class="qrow-actions"><button class="btn-xs danger">Escalate</button><button class="btn-xs ghost">Chase</button></div>
-          </div>
-          <div class="qrow">
-            <span class="type-pill sda">SDA</span>
-            <div class="qrow-main"><div class="qrow-id">TST2600114</div><div class="qrow-meta">Test Vessel 1 · Test Port</div></div>
-            <div class="qrow-amount"><div class="qrow-usd">USD 8,640</div><div class="qrow-usd-meta">PDA USD 9,200 · due 24 Jun</div></div>
-            <span class="day-badge overdue">8d overdue</span>
-            <div class="qrow-actions"><button class="btn-xs danger">Escalate</button><button class="btn-xs ghost">Chase</button></div>
-          </div>
+        </div>
+        <div class="filter-tabs" id="overdue-tabs">
+          <div class="filter-tab active" data-prefix="overdue" data-type="all">All (3)</div>
+          <div class="filter-tab" data-prefix="overdue" data-type="PDA">PDA (1)</div>
+          <div class="filter-tab" data-prefix="overdue" data-type="FDA">FDA (1)</div>
+          <div class="filter-tab" data-prefix="overdue" data-type="SDA">SDA (1)</div>
+        </div>
+        <div class="table-card">
+          <table class="dtable" id="overdue-table">
+            <thead>
+              <tr><th>Port Call</th><th>Type</th><th>Vessel</th><th>Port</th><th class="num">Balance</th><th>Due</th><th class="mid">Days</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+              <tr data-type="PDA"><td class="pc-id">TST2600098</td><td><span class="da-tier pda">PDA</span></td><td>Pacific Wind</td><td>Hamburg</td><td class="num">USD 5,240</td><td>18 Jun</td><td class="mid"><span class="da-pill urgent">14d overdue</span></td><td class="actions"><button class="btn-mini btn-escalate" onclick="fireToast('Escalated TST2600098',event)">Escalate</button><button class="btn-mini btn-ghost" onclick="fireToast('Chase sent',event)">Chase</button></td></tr>
+              <tr data-type="FDA"><td class="pc-id">TST2600082</td><td><span class="da-tier fda">FDA</span></td><td>Omicron West</td><td>Singapore</td><td class="num">USD 38,720</td><td>12 Jun</td><td class="mid"><span class="da-pill urgent">12d overdue</span></td><td class="actions"><button class="btn-mini btn-escalate" onclick="fireToast('Escalated TST2600082',event)">Escalate</button><button class="btn-mini btn-ghost" onclick="fireToast('Chase sent',event)">Chase</button></td></tr>
+              <tr data-type="SDA"><td class="pc-id">TST2600114</td><td><span class="da-tier sda">SDA</span></td><td>Test Vessel 1</td><td>Test Port</td><td class="num">USD 8,640</td><td>24 Jun</td><td class="mid"><span class="da-pill warn">8d overdue</span></td><td class="actions"><button class="btn-mini btn-escalate" onclick="fireToast('Escalated TST2600114',event)">Escalate</button><button class="btn-mini btn-ghost" onclick="fireToast('Chase sent',event)">Chase</button></td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
       <!-- Pending approval -->
       <div class="queue-panel" data-panel="approval">
-        <div class="card queue-card">
-          <div class="queue-head blue">
-            <div class="queue-head-left"><span class="queue-dot blue"></span><span class="queue-title blue">Pending your approval</span><span class="queue-count">5</span></div>
+        <div class="page-hdr">
+          <div>
+            <div class="page-title-row"><h2 class="page-title">Pending Approval</h2><span class="page-count">15</span></div>
+            <p class="page-desc">DAs submitted by agents awaiting operator sign-off. Sorted by oldest submission first.</p>
           </div>
-          <div class="qrow">
-            <span class="type-pill fda">FDA</span>
-            <div class="qrow-main"><div class="qrow-id">TST2600082</div><div class="qrow-meta">Omicron West · Singapore · ABC Test Shipping</div></div>
-            <div class="qrow-amount"><div class="qrow-usd">USD 25,624</div><div class="qrow-usd-meta">Balance</div></div>
-            <span class="day-badge soon">6 days</span>
-            <div class="qrow-actions"><button class="btn-xs primary">Approve</button><button class="btn-xs ghost">Query</button></div>
+          <div class="page-stats">
+            <div class="pstat"><span class="pstat-val">USD 189,419</span><span class="pstat-lbl">Total pending</span></div>
+            <div class="pstat"><span class="pstat-val">7d</span><span class="pstat-lbl">Oldest item</span></div>
+            <div class="pstat"><span class="pstat-val">2.3d</span><span class="pstat-lbl">Avg approval time</span></div>
           </div>
-          <div class="qrow">
-            <span class="type-pill fda">FDA</span>
-            <div class="qrow-main"><div class="qrow-id">TST2600113</div><div class="qrow-meta">Test Vessel 1 · Singapore · ABC Test Shipping</div></div>
-            <div class="qrow-amount"><div class="qrow-usd">USD 18,450</div><div class="qrow-usd-meta">Balance</div></div>
-            <span class="day-badge soon">3 days</span>
-            <div class="qrow-actions"><button class="btn-xs primary">Approve</button><button class="btn-xs ghost">Query</button></div>
-          </div>
-          <div class="qrow">
-            <span class="type-pill apda">APDA</span>
-            <div class="qrow-main"><div class="qrow-id">TST2600067</div><div class="qrow-meta">Test Vessel 1 · Test Port · ABC Test Shipping</div></div>
-            <div class="qrow-amount"><div class="qrow-usd">USD 6,318</div><div class="qrow-usd-meta">Total</div></div>
-            <span class="day-badge soon">3 days</span>
-            <div class="qrow-actions"><button class="btn-xs primary">Approve</button><button class="btn-xs ghost">Query</button></div>
-          </div>
-          <div class="qrow">
-            <span class="type-pill sda">SDA</span>
-            <div class="qrow-main"><div class="qrow-id">TST2600114</div><div class="qrow-meta">Test Vessel 1 · Test Port · Keppel Smit</div></div>
-            <div class="qrow-amount"><div class="qrow-usd">USD 637</div><div class="qrow-usd-meta">Balance</div></div>
-            <span class="day-badge today">Today</span>
-            <div class="qrow-actions"><button class="btn-xs primary">Approve</button><button class="btn-xs ghost">Query</button></div>
-          </div>
-          <div class="qrow">
-            <span class="type-pill pda">PDA</span>
-            <div class="qrow-main"><div class="qrow-id">TST2600117</div><div class="qrow-meta">Test Vessel 1 · Test Port · Test Vendor 22</div></div>
-            <div class="qrow-amount"><div class="qrow-usd">USD 4,200</div><div class="qrow-usd-meta">Total</div></div>
-            <span class="day-badge ok">1 day</span>
-            <div class="qrow-actions"><button class="btn-xs primary">Approve</button><button class="btn-xs ghost">Query</button></div>
-          </div>
+        </div>
+        <div class="filter-tabs" id="approval-tabs">
+          <div class="filter-tab active" data-prefix="approval" data-type="all">All (15)</div>
+          <div class="filter-tab" data-prefix="approval" data-type="FDA">FDA (5)</div>
+          <div class="filter-tab" data-prefix="approval" data-type="APDA">APDA (3)</div>
+          <div class="filter-tab" data-prefix="approval" data-type="SDA">SDA (3)</div>
+          <div class="filter-tab" data-prefix="approval" data-type="PDA">PDA (4)</div>
+        </div>
+        <div class="table-card">
+          <table class="dtable" id="approval-table">
+            <thead>
+              <tr><th>Port Call</th><th>Type</th><th>Vessel</th><th>Port</th><th>Agent</th><th class="num">Amount</th><th class="mid">Days</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+              <tr data-type="FDA"><td class="pc-id">TST2600082</td><td><span class="da-tier fda">FDA</span></td><td>Omicron West</td><td>Singapore</td><td>ABC Test Shipping</td><td class="num">USD 25,624</td><td class="mid"><span class="da-pill warn">6 days</span></td><td class="actions"><button class="btn-mini btn-approve" onclick="fireToast('Approved TST2600082',event)">Approve</button><button class="btn-mini btn-ghost" onclick="fireToast('Query sent',event)">Query</button></td></tr>
+              <tr data-type="FDA"><td class="pc-id">TST2600113</td><td><span class="da-tier fda">FDA</span></td><td>Test Vessel 1</td><td>Singapore</td><td>ABC Test Shipping</td><td class="num">USD 18,450</td><td class="mid"><span class="da-pill warn">3 days</span></td><td class="actions"><button class="btn-mini btn-approve" onclick="fireToast('Approved TST2600113',event)">Approve</button><button class="btn-mini btn-ghost" onclick="fireToast('Query sent',event)">Query</button></td></tr>
+              <tr data-type="APDA"><td class="pc-id">TST2600067</td><td><span class="da-tier apda">APDA</span></td><td>Test Vessel 1</td><td>Test Port</td><td>ABC Test Shipping</td><td class="num">USD 6,318</td><td class="mid"><span class="da-pill warn">3 days</span></td><td class="actions"><button class="btn-mini btn-approve" onclick="fireToast('Approved TST2600067',event)">Approve</button><button class="btn-mini btn-ghost" onclick="fireToast('Query sent',event)">Query</button></td></tr>
+              <tr data-type="SDA"><td class="pc-id">TST2600114</td><td><span class="da-tier sda">SDA</span></td><td>Test Vessel 1</td><td>Test Port</td><td>Keppel Smit</td><td class="num">USD 637</td><td class="mid"><span class="da-pill ok">Today</span></td><td class="actions"><button class="btn-mini btn-approve" onclick="fireToast('Approved TST2600114',event)">Approve</button><button class="btn-mini btn-ghost" onclick="fireToast('Query sent',event)">Query</button></td></tr>
+              <tr data-type="PDA"><td class="pc-id">TST2600117</td><td><span class="da-tier pda">PDA</span></td><td>Test Vessel 1</td><td>Test Port</td><td>Test Vendor 22</td><td class="num">USD 4,200</td><td class="mid"><span class="da-pill info">1 day</span></td><td class="actions"><button class="btn-mini btn-approve" onclick="fireToast('Approved TST2600117',event)">Approve</button><button class="btn-mini btn-ghost" onclick="fireToast('Query sent',event)">Query</button></td></tr>
+              <tr data-type="FDA"><td class="pc-id">TST2600122</td><td><span class="da-tier fda">FDA</span></td><td>Atlantic Hope</td><td>Hamburg</td><td>Eurogate Agency</td><td class="num">USD 14,950</td><td class="mid"><span class="da-pill warn">5 days</span></td><td class="actions"><button class="btn-mini btn-approve" onclick="fireToast('Approved TST2600122',event)">Approve</button><button class="btn-mini btn-ghost" onclick="fireToast('Query sent',event)">Query</button></td></tr>
+              <tr data-type="FDA"><td class="pc-id">TST2600125</td><td><span class="da-tier fda">FDA</span></td><td>Crimson Jade</td><td>Port Klang</td><td>Straits Agency</td><td class="num">USD 7,820</td><td class="mid"><span class="da-pill info">2 days</span></td><td class="actions"><button class="btn-mini btn-approve" onclick="fireToast('Approved TST2600125',event)">Approve</button><button class="btn-mini btn-ghost" onclick="fireToast('Query sent',event)">Query</button></td></tr>
+              <tr data-type="FDA"><td class="pc-id">TST2600127</td><td><span class="da-tier fda">FDA</span></td><td>Eastern Horizon</td><td>Busan</td><td>Hanjin Agency</td><td class="num">USD 21,300</td><td class="mid"><span class="da-pill warn">4 days</span></td><td class="actions"><button class="btn-mini btn-approve" onclick="fireToast('Approved TST2600127',event)">Approve</button><button class="btn-mini btn-ghost" onclick="fireToast('Query sent',event)">Query</button></td></tr>
+              <tr data-type="APDA"><td class="pc-id">TST2600128</td><td><span class="da-tier apda">APDA</span></td><td>Nordic Star</td><td>Antwerp</td><td>Boskalis Terminal</td><td class="num">USD 5,430</td><td class="mid"><span class="da-pill info">2 days</span></td><td class="actions"><button class="btn-mini btn-approve" onclick="fireToast('Approved TST2600128',event)">Approve</button><button class="btn-mini btn-ghost" onclick="fireToast('Query sent',event)">Query</button></td></tr>
+              <tr data-type="APDA"><td class="pc-id">TST2600130</td><td><span class="da-tier apda">APDA</span></td><td>MSC Voyager</td><td>Rotterdam</td><td>Maersk Agency</td><td class="num">USD 19,200</td><td class="mid"><span class="da-pill warn">7 days</span></td><td class="actions"><button class="btn-mini btn-approve" onclick="fireToast('Approved TST2600130',event)">Approve</button><button class="btn-mini btn-ghost" onclick="fireToast('Query sent',event)">Query</button></td></tr>
+              <tr data-type="SDA"><td class="pc-id">TST2600132</td><td><span class="da-tier sda">SDA</span></td><td>Pacific Wind</td><td>Hamburg</td><td>Test Vendor-A</td><td class="num">USD 12,640</td><td class="mid"><span class="da-pill warn">3 days</span></td><td class="actions"><button class="btn-mini btn-approve" onclick="fireToast('Approved TST2600132',event)">Approve</button><button class="btn-mini btn-ghost" onclick="fireToast('Query sent',event)">Query</button></td></tr>
+              <tr data-type="SDA"><td class="pc-id">TST2600134</td><td><span class="da-tier sda">SDA</span></td><td>Crimson Jade</td><td>Singapore</td><td>Keppel Smit</td><td class="num">USD 21,300</td><td class="mid"><span class="da-pill warn">4 days</span></td><td class="actions"><button class="btn-mini btn-approve" onclick="fireToast('Approved TST2600134',event)">Approve</button><button class="btn-mini btn-ghost" onclick="fireToast('Query sent',event)">Query</button></td></tr>
+              <tr data-type="PDA"><td class="pc-id">TST2600136</td><td><span class="da-tier pda">PDA</span></td><td>Atlantic Hope</td><td>Port Klang</td><td>Straits Agency</td><td class="num">USD 8,900</td><td class="mid"><span class="da-pill info">1 day</span></td><td class="actions"><button class="btn-mini btn-approve" onclick="fireToast('Approved TST2600136',event)">Approve</button><button class="btn-mini btn-ghost" onclick="fireToast('Query sent',event)">Query</button></td></tr>
+              <tr data-type="PDA"><td class="pc-id">TST2600138</td><td><span class="da-tier pda">PDA</span></td><td>Test Vessel 3</td><td>Singapore</td><td>ABC Test Shipping</td><td class="num">USD 13,200</td><td class="mid"><span class="da-pill info">2 days</span></td><td class="actions"><button class="btn-mini btn-approve" onclick="fireToast('Approved TST2600138',event)">Approve</button><button class="btn-mini btn-ghost" onclick="fireToast('Query sent',event)">Query</button></td></tr>
+              <tr data-type="PDA"><td class="pc-id">TST2600141</td><td><span class="da-tier pda">PDA</span></td><td>Eastern Horizon</td><td>Rotterdam</td><td>Boskalis Terminal</td><td class="num">USD 9,450</td><td class="mid"><span class="da-pill warn">3 days</span></td><td class="actions"><button class="btn-mini btn-approve" onclick="fireToast('Approved TST2600141',event)">Approve</button><button class="btn-mini btn-ghost" onclick="fireToast('Query sent',event)">Query</button></td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
       <!-- Under clarification -->
       <div class="queue-panel" data-panel="clarification">
-        <div class="card queue-card">
-          <div class="queue-head amber">
-            <div class="queue-head-left"><span class="queue-dot amber"></span><span class="queue-title amber">Under clarification</span><span class="queue-count">4</span></div>
+        <div class="page-hdr">
+          <div>
+            <div class="page-title-row"><h2 class="page-title">Under Clarification</h2><span class="page-count" style="color:#844D0F;background:var(--amber-10);">12</span></div>
+            <p class="page-desc">Queries raised with agents or vendors; awaiting a reply before the DA can proceed.</p>
           </div>
-          <div class="qrow">
-            <span class="type-pill pda">PDA</span>
-            <div class="qrow-main"><div class="qrow-id">TST2600111</div><div class="qrow-meta">Omicron West · Singapore · ABC Test Shipping</div></div>
-            <div class="qrow-amount"><div class="qrow-usd">USD 15,400</div><div class="qrow-usd-meta">Balance</div></div>
-            <span class="day-badge soon">8 days</span>
-            <div class="qrow-actions"><button class="btn-xs amber">Resolve</button><button class="btn-xs ghost">Reply</button></div>
+          <div class="page-stats">
+            <div class="pstat"><span class="pstat-val">USD 99,475</span><span class="pstat-lbl">Total value</span></div>
+            <div class="pstat"><span class="pstat-val">8d</span><span class="pstat-lbl">Longest open</span></div>
           </div>
-          <div class="qrow">
-            <span class="type-pill fda">FDA</span>
-            <div class="qrow-main"><div class="qrow-id">TST2600140</div><div class="qrow-meta">Atlantic Hope · Test Port · Keppel Smit</div></div>
-            <div class="qrow-amount"><div class="qrow-usd">USD 12,750</div><div class="qrow-usd-meta">Balance</div></div>
-            <span class="day-badge soon">6 days</span>
-            <div class="qrow-actions"><button class="btn-xs amber">Resolve</button><button class="btn-xs ghost">Reply</button></div>
-          </div>
-          <div class="qrow">
-            <span class="type-pill fda">FDA</span>
-            <div class="qrow-main"><div class="qrow-id">TST2600120</div><div class="qrow-meta">Nordic Star · Rotterdam · ABC Test Shipping</div></div>
-            <div class="qrow-amount"><div class="qrow-usd">USD 9,880</div><div class="qrow-usd-meta">Balance</div></div>
-            <span class="day-badge soon">5 days</span>
-            <div class="qrow-actions"><button class="btn-xs amber">Resolve</button><button class="btn-xs ghost">Reply</button></div>
-          </div>
-          <div class="qrow">
-            <span class="type-pill pda">PDA</span>
-            <div class="qrow-main"><div class="qrow-id">TST2600131</div><div class="qrow-meta">Pacific Wind · Hamburg · Test Vendor 22</div></div>
-            <div class="qrow-amount"><div class="qrow-usd">USD 3,120</div><div class="qrow-usd-meta">Total</div></div>
-            <span class="day-badge ok">2 days</span>
-            <div class="qrow-actions"><button class="btn-xs amber">Resolve</button><button class="btn-xs ghost">Reply</button></div>
-          </div>
+        </div>
+        <div class="filter-tabs" id="clarification-tabs">
+          <div class="filter-tab active" data-prefix="clarification" data-type="all">All (12)</div>
+          <div class="filter-tab" data-prefix="clarification" data-type="PDA">PDA (4)</div>
+          <div class="filter-tab" data-prefix="clarification" data-type="FDA">FDA (4)</div>
+          <div class="filter-tab" data-prefix="clarification" data-type="SDA">SDA (2)</div>
+          <div class="filter-tab" data-prefix="clarification" data-type="APDA">APDA (2)</div>
+        </div>
+        <div class="table-card">
+          <table class="dtable" id="clarification-table">
+            <thead>
+              <tr><th>Port Call</th><th>Type</th><th>Vessel</th><th>Port</th><th>Agent</th><th class="num">Amount</th><th class="mid">Days</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+              <tr data-type="PDA"><td class="pc-id">TST2600111</td><td><span class="da-tier pda">PDA</span></td><td>Omicron West</td><td>Singapore</td><td>ABC Test Shipping</td><td class="num">USD 15,400</td><td class="mid"><span class="da-pill urgent">8 days</span></td><td class="actions"><button class="btn-mini btn-resolve" onclick="fireToast('Resolved TST2600111',event)">Resolve</button><button class="btn-mini btn-ghost" onclick="fireToast('Reply sent',event)">Reply</button></td></tr>
+              <tr data-type="FDA"><td class="pc-id">TST2600140</td><td><span class="da-tier fda">FDA</span></td><td>Atlantic Hope</td><td>Test Port</td><td>Keppel Smit</td><td class="num">USD 12,750</td><td class="mid"><span class="da-pill warn">6 days</span></td><td class="actions"><button class="btn-mini btn-resolve" onclick="fireToast('Resolved TST2600140',event)">Resolve</button><button class="btn-mini btn-ghost" onclick="fireToast('Reply sent',event)">Reply</button></td></tr>
+              <tr data-type="FDA"><td class="pc-id">TST2600120</td><td><span class="da-tier fda">FDA</span></td><td>Nordic Star</td><td>Rotterdam</td><td>ABC Test Shipping</td><td class="num">USD 9,880</td><td class="mid"><span class="da-pill warn">5 days</span></td><td class="actions"><button class="btn-mini btn-resolve" onclick="fireToast('Resolved TST2600120',event)">Resolve</button><button class="btn-mini btn-ghost" onclick="fireToast('Reply sent',event)">Reply</button></td></tr>
+              <tr data-type="PDA"><td class="pc-id">TST2600131</td><td><span class="da-tier pda">PDA</span></td><td>Pacific Wind</td><td>Hamburg</td><td>Test Vendor 22</td><td class="num">USD 3,120</td><td class="mid"><span class="da-pill info">2 days</span></td><td class="actions"><button class="btn-mini btn-resolve" onclick="fireToast('Resolved TST2600131',event)">Resolve</button><button class="btn-mini btn-ghost" onclick="fireToast('Reply sent',event)">Reply</button></td></tr>
+              <tr data-type="PDA"><td class="pc-id">TST2600143</td><td><span class="da-tier pda">PDA</span></td><td>Crimson Jade</td><td>Port Klang</td><td>Straits Agency</td><td class="num">USD 7,610</td><td class="mid"><span class="da-pill warn">4 days</span></td><td class="actions"><button class="btn-mini btn-resolve" onclick="fireToast('Resolved TST2600143',event)">Resolve</button><button class="btn-mini btn-ghost" onclick="fireToast('Reply sent',event)">Reply</button></td></tr>
+              <tr data-type="PDA"><td class="pc-id">TST2600144</td><td><span class="da-tier pda">PDA</span></td><td>Eastern Horizon</td><td>Busan</td><td>Hanjin Agency</td><td class="num">USD 5,200</td><td class="mid"><span class="da-pill info">3 days</span></td><td class="actions"><button class="btn-mini btn-resolve" onclick="fireToast('Resolved TST2600144',event)">Resolve</button><button class="btn-mini btn-ghost" onclick="fireToast('Reply sent',event)">Reply</button></td></tr>
+              <tr data-type="FDA"><td class="pc-id">TST2600145</td><td><span class="da-tier fda">FDA</span></td><td>MSC Voyager</td><td>Rotterdam</td><td>Maersk Agency</td><td class="num">USD 18,340</td><td class="mid"><span class="da-pill urgent">7 days</span></td><td class="actions"><button class="btn-mini btn-resolve" onclick="fireToast('Resolved TST2600145',event)">Resolve</button><button class="btn-mini btn-ghost" onclick="fireToast('Reply sent',event)">Reply</button></td></tr>
+              <tr data-type="FDA"><td class="pc-id">TST2600146</td><td><span class="da-tier fda">FDA</span></td><td>Test Vessel 3</td><td>Singapore</td><td>ABC Test Shipping</td><td class="num">USD 6,850</td><td class="mid"><span class="da-pill info">2 days</span></td><td class="actions"><button class="btn-mini btn-resolve" onclick="fireToast('Resolved TST2600146',event)">Resolve</button><button class="btn-mini btn-ghost" onclick="fireToast('Reply sent',event)">Reply</button></td></tr>
+              <tr data-type="SDA"><td class="pc-id">TST2600147</td><td><span class="da-tier sda">SDA</span></td><td>Nordic Star</td><td>Antwerp</td><td>Boskalis Terminal</td><td class="num">USD 4,980</td><td class="mid"><span class="da-pill warn">5 days</span></td><td class="actions"><button class="btn-mini btn-resolve" onclick="fireToast('Resolved TST2600147',event)">Resolve</button><button class="btn-mini btn-ghost" onclick="fireToast('Reply sent',event)">Reply</button></td></tr>
+              <tr data-type="SDA"><td class="pc-id">TST2600148</td><td><span class="da-tier sda">SDA</span></td><td>Atlantic Hope</td><td>Rotterdam</td><td>Keppel Smit</td><td class="num">USD 9,750</td><td class="mid"><span class="da-pill warn">3 days</span></td><td class="actions"><button class="btn-mini btn-resolve" onclick="fireToast('Resolved TST2600148',event)">Resolve</button><button class="btn-mini btn-ghost" onclick="fireToast('Reply sent',event)">Reply</button></td></tr>
+              <tr data-type="APDA"><td class="pc-id">TST2600149</td><td><span class="da-tier apda">APDA</span></td><td>Pacific Wind</td><td>Hamburg</td><td>Eurogate Agency</td><td class="num">USD 3,415</td><td class="mid"><span class="da-pill warn">6 days</span></td><td class="actions"><button class="btn-mini btn-resolve" onclick="fireToast('Resolved TST2600149',event)">Resolve</button><button class="btn-mini btn-ghost" onclick="fireToast('Reply sent',event)">Reply</button></td></tr>
+              <tr data-type="APDA"><td class="pc-id">TST2600150</td><td><span class="da-tier apda">APDA</span></td><td>Omicron West</td><td>Singapore</td><td>Test Vendor-A</td><td class="num">USD 2,180</td><td class="mid"><span class="da-pill info">1 day</span></td><td class="actions"><button class="btn-mini btn-resolve" onclick="fireToast('Resolved TST2600150',event)">Resolve</button><button class="btn-mini btn-ghost" onclick="fireToast('Reply sent',event)">Reply</button></td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
       <!-- Pending appointment -->
       <div class="queue-panel" data-panel="appointment">
-        <div class="card queue-card">
-          <div class="queue-head navy">
-            <div class="queue-head-left"><span class="queue-dot navy"></span><span class="queue-title navy">Pending appointment</span><span class="queue-count">5</span></div>
+        <div class="page-hdr">
+          <div>
+            <div class="page-title-row"><h2 class="page-title">Pending Appointment</h2><span class="page-count">17</span></div>
+            <p class="page-desc">Port calls with a confirmed vessel arrival awaiting an operator appointment slot.</p>
           </div>
-          <div class="pc-row">
-            <div><div class="pc-name">Omicron West</div><div class="pc-meta">Singapore · V026-04</div></div>
-            <div class="pc-date"><div class="pc-day">02 Jul</div><div class="pc-rel today">Today</div></div>
+          <div class="page-stats">
+            <div class="pstat"><span class="pstat-val">1</span><span class="pstat-lbl">Due today</span></div>
+            <div class="pstat"><span class="pstat-val">20d</span><span class="pstat-lbl">Furthest out</span></div>
           </div>
-          <div class="pc-row">
-            <div><div class="pc-name">Nordic Star</div><div class="pc-meta">Rotterdam · NS-2026-07</div></div>
-            <div class="pc-date"><div class="pc-day">04 Jul</div><div class="pc-rel soon">in 2d</div></div>
-          </div>
-          <div class="pc-row">
-            <div><div class="pc-name">Pacific Wind</div><div class="pc-meta">Hamburg · PW-114</div></div>
-            <div class="pc-date"><div class="pc-day">06 Jul</div><div class="pc-rel soon">in 4d</div></div>
-          </div>
-          <div class="pc-row">
-            <div><div class="pc-name">Atlantic Hope</div><div class="pc-meta">Test Port · AH-038</div></div>
-            <div class="pc-date"><div class="pc-day">08 Jul</div><div class="pc-rel later">in 6d</div></div>
-          </div>
-          <div class="pc-row">
-            <div><div class="pc-name">Test Vessel 3</div><div class="pc-meta">Singapore · TV3-22</div></div>
-            <div class="pc-date"><div class="pc-day">10 Jul</div><div class="pc-rel later">in 8d</div></div>
-          </div>
+        </div>
+        <div class="table-card">
+          <table class="dtable" id="appointment-table">
+            <thead>
+              <tr><th>Vessel</th><th>Port</th><th>Reference</th><th>Date</th><th class="mid">Status</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="pc-id">Omicron West</td><td>Singapore</td><td>V026-04</td><td>02 Jul</td><td class="mid"><span class="da-pill urgent">Today</span></td></tr>
+              <tr><td class="pc-id">Nordic Star</td><td>Rotterdam</td><td>NS-2026-07</td><td>04 Jul</td><td class="mid"><span class="da-pill warn">in 2d</span></td></tr>
+              <tr><td class="pc-id">Pacific Wind</td><td>Hamburg</td><td>PW-114</td><td>06 Jul</td><td class="mid"><span class="da-pill warn">in 4d</span></td></tr>
+              <tr><td class="pc-id">Atlantic Hope</td><td>Test Port</td><td>AH-038</td><td>08 Jul</td><td class="mid"><span class="da-pill slate">in 6d</span></td></tr>
+              <tr><td class="pc-id">Test Vessel 3</td><td>Singapore</td><td>TV3-22</td><td>10 Jul</td><td class="mid"><span class="da-pill slate">in 8d</span></td></tr>
+              <tr><td class="pc-id">Crimson Jade</td><td>Port Klang</td><td>CJ-2026-11</td><td>11 Jul</td><td class="mid"><span class="da-pill slate">in 9d</span></td></tr>
+              <tr><td class="pc-id">Eastern Horizon</td><td>Busan</td><td>EH-077</td><td>12 Jul</td><td class="mid"><span class="da-pill slate">in 10d</span></td></tr>
+              <tr><td class="pc-id">MSC Voyager</td><td>Rotterdam</td><td>MSC-204</td><td>13 Jul</td><td class="mid"><span class="da-pill slate">in 11d</span></td></tr>
+              <tr><td class="pc-id">Test Vessel 1</td><td>Test Port</td><td>TV1-09</td><td>14 Jul</td><td class="mid"><span class="da-pill slate">in 12d</span></td></tr>
+              <tr><td class="pc-id">Omicron West</td><td>Singapore</td><td>V026-05</td><td>15 Jul</td><td class="mid"><span class="da-pill slate">in 13d</span></td></tr>
+              <tr><td class="pc-id">Nordic Star</td><td>Antwerp</td><td>NS-2026-08</td><td>16 Jul</td><td class="mid"><span class="da-pill slate">in 14d</span></td></tr>
+              <tr><td class="pc-id">Pacific Wind</td><td>Singapore</td><td>PW-118</td><td>17 Jul</td><td class="mid"><span class="da-pill slate">in 15d</span></td></tr>
+              <tr><td class="pc-id">Atlantic Hope</td><td>Hamburg</td><td>AH-041</td><td>18 Jul</td><td class="mid"><span class="da-pill slate">in 16d</span></td></tr>
+              <tr><td class="pc-id">Test Vessel 3</td><td>Rotterdam</td><td>TV3-23</td><td>19 Jul</td><td class="mid"><span class="da-pill slate">in 17d</span></td></tr>
+              <tr><td class="pc-id">Crimson Jade</td><td>Singapore</td><td>CJ-2026-12</td><td>20 Jul</td><td class="mid"><span class="da-pill slate">in 18d</span></td></tr>
+              <tr><td class="pc-id">Eastern Horizon</td><td>Rotterdam</td><td>EH-078</td><td>21 Jul</td><td class="mid"><span class="da-pill slate">in 19d</span></td></tr>
+              <tr><td class="pc-id">MSC Voyager</td><td>Antwerp</td><td>MSC-205</td><td>22 Jul</td><td class="mid"><span class="da-pill slate">in 20d</span></td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -469,28 +512,71 @@
   </main>
 </div>
 
+<div class="toast-wrap" id="toast-wrap" aria-live="polite"></div>
 <script>
 (function () {
-  const tabs = document.querySelectorAll('#queueTabs .queue-tab');
   const panels = document.querySelectorAll('.queue-panel');
+  const breadcrumbCurrent = document.getElementById('breadcrumbCurrent');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const TITLES = {
+    overdue: 'Overdue DAs',
+    approval: 'Pending Approval',
+    clarification: 'Under Clarification',
+    appointment: 'Pending Appointment'
+  };
 
-  function activate(name) {
-    tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === name));
-    panels.forEach(p => p.classList.toggle('active', p.dataset.panel === name));
+  function staggerRows(panel) {
+    const rows = panel.querySelectorAll('.dtable tbody tr');
+    rows.forEach(r => r.classList.remove('row-in'));
+    if (reduceMotion) return;
+    rows.forEach((row, i) => {
+      row.style.animationDelay = Math.min(i * 30, 300) + 'ms';
+      requestAnimationFrame(() => row.classList.add('row-in'));
+    });
   }
 
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      activate(tab.dataset.tab);
-      const url = new URL(window.location.href);
-      url.searchParams.set('tab', tab.dataset.tab);
-      window.history.replaceState({}, '', url);
+  function activate(name) {
+    panels.forEach(p => {
+      const isActive = p.dataset.panel === name;
+      p.classList.toggle('active', isActive);
+      if (isActive) staggerRows(p);
+    });
+    breadcrumbCurrent.textContent = TITLES[name] || name;
+  }
+
+  const validTabs = Object.keys(TITLES);
+  const requested = new URLSearchParams(window.location.search).get('tab');
+  activate(validTabs.includes(requested) ? requested : validTabs[0]);
+
+  // ── Per-panel DA-type filter tabs ──
+  document.querySelectorAll('.filter-tabs').forEach(tabsEl => {
+    tabsEl.querySelectorAll('.filter-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        const prefix = tab.dataset.prefix;
+        const type = tab.dataset.type;
+        tabsEl.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const table = document.getElementById(prefix + '-table');
+        if (!table) return;
+        const rows = table.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+          row.style.display = (type === 'all' || row.dataset.type === type) ? '' : 'none';
+        });
+        staggerRows(table.closest('.queue-panel'));
+      });
     });
   });
 
-  const validTabs = Array.from(tabs).map(t => t.dataset.tab);
-  const requested = new URLSearchParams(window.location.search).get('tab');
-  activate(validTabs.includes(requested) ? requested : validTabs[0]);
+  // ── Toast ──
+  window.fireToast = function (msg, e) {
+    if (e) e.stopPropagation();
+    const wrap = document.getElementById('toast-wrap');
+    const t = document.createElement('div');
+    t.className = 'toast';
+    t.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' + msg;
+    wrap.appendChild(t);
+    setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 260); }, 2200);
+  };
 })();
 </script>
 </body>
